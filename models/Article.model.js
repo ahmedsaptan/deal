@@ -19,11 +19,10 @@ const articleSchema = new Schema(
       type: Number,
       default: 0,
     },
-    thumbsUpCount: {
+    thumbsDownCount: {
       type: Number,
       default: 0,
     },
-    
   },
   {
     timestamps: true,
