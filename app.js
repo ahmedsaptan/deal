@@ -26,6 +26,10 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/api", indexRouter);
 
+const ROOT_URL =
+  process.env == "production"
+    ? "https://saptan-deal.herokuapp.com"
+    : "http://localhost:3000";
 const options = {
   definition: {
     openapi: "3.0.0",
@@ -37,7 +41,7 @@ const options = {
     },
     servers: [
       {
-        url: "http://localhost:3000/api/",
+        url: `${ROOT_URL}/api/`,
       },
     ],
   },
