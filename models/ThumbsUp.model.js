@@ -7,9 +7,9 @@ const thumbsUpSchema = new Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Author",
     },
-    comment: {
+    article: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Comment",
+      ref: "Article",
     },
   },
   {

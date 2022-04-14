@@ -15,6 +15,20 @@ router.post(
   ArticleController.validateOnCreateArticle(),
   ArticleController.createArticle
 );
-router.post("/:id/comment", )
+router.post(
+  "/:id/comment",
+  ArticleController.validateOnCommentOnArticle(),
+  ArticleController.commentInArticle
+);
+router.patch(
+  "/:id/thumbs-up",
+  ArticleController.validateOnGetById(),
+  ArticleController.thumbsUp
+);
+router.patch(
+  "/:id/thumbs-down",
+  ArticleController.validateOnGetById(),
+  ArticleController.thumbsDown
+);
 
 module.exports = router;

@@ -91,12 +91,130 @@ const validateOnCommentOnArticle = () => {
 };
 const commentInArticle = async (req, res, next) => {
   try {
-    const body = checkValidations(req);
+    const { body } = checkValidations(req);
+    const article = req.existArticle;
+    const currentUser = req.currentUser;
+    const comment = new Comment({
+      body,
+      article: article._id,
+      by: currentUser._id,
+    });
+
+    await comment.save();
+    article.comments.push(comment._id);
+    await article.save();
+    res.send({
+      comment,
+      article,
+    });
   } catch (error) {
     next(error);
   }
 };
+const validateOnGetById = () => {
+  return [
+    param("id")
+      .exists()
+      .withMessage("id is required")
+      .bail()
+      .isMongoId()
+      .withMessage("id must be mongoID")
+      .bail()
+      .custom(async (value, { req }) => {
+        const article = await Article.findById(value);
+        if (!article) {
+          throw createError.NotFound("article not found");
+        }
+        req.existArticle = article;
+        return true;
+      }),
+  ];
+};
 
+const thumbsUp = async (req, res, next) => {
+  try {
+    const article = req.existArticle;
+    const currentUser = req.currentUser;
+    const [existDown, existUp] = await Promise.all([
+      ThumbsDownModel.findOne({
+        author: currentUser._id,
+        article: article._id,
+      }),
+      ThumbsUpModel.findOne({
+        author: currentUser._id,
+        article: article._id,
+      }),
+    ]);
+
+    if (existUp) {
+      throw createError.BadRequest("author already thumbs up this article");
+    }
+    // then. remove one from down
+    if (existDown) {
+      currentUser.thumbsDownCount--;
+      article.thumbsDownCount--;
+      await existDown.remove();
+    }
+
+    const up = new ThumbsUpModel({
+      author: currentUser._id,
+      article: article._id,
+    });
+
+    currentUser.thumbsUpCount++;
+    article.thumbsUpCount++;
+
+    await Promise.all([up.save(), currentUser.save(), article.save()]);
+
+    res.send({
+      up,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+const thumbsDown = async (req, res, next) => {
+  try {
+    const article = req.existArticle;
+    const currentUser = req.currentUser;
+    const [existDown, existUp] = await Promise.all([
+      ThumbsDownModel.findOne({
+        author: currentUser._id,
+        article: article._id,
+      }),
+      ThumbsUpModel.findOne({
+        author: currentUser._id,
+        article: article._id,
+      }),
+    ]);
+
+    if (existDown) {
+      throw createError.BadRequest("author already thumbs down this article");
+    }
+    // then. remove one from down
+    if (existUp) {
+      currentUser.thumbsUpCount--;
+      article.thumbsUpCount--;
+      await existUp.remove();
+    }
+
+    const down = new ThumbsDownModel({
+      author: currentUser._id,
+      article: article._id,
+    });
+
+    currentUser.thumbsDownCount++;
+    article.thumbsDownCount++;
+
+    await Promise.all([down.save(), currentUser.save(), article.save()]);
+
+    res.send({
+      down,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 module.exports = {
   createArticle,
   listArticle,
@@ -105,4 +223,7 @@ module.exports = {
   getOneArticle,
   validateOnCommentOnArticle,
   commentInArticle,
+  thumbsUp,
+  thumbsDown,
+  validateOnGetById,
 };
