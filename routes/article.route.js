@@ -8,6 +8,22 @@ const { auth } = require("../middlewares/auth");
  * /articles:
  *   get:
  *     summary: list all articles.
+ *     parameters:
+ *             - in: query
+ *               name: searchTerm
+ *               schema:
+ *                 type: string
+ *               description: the string you want to search with it
+ *             - in: query
+ *               name: sortUp
+ *               schema:
+ *                 type: boolean
+ *               description: sortUp if you wan to sort the result with number of thumbs up
+ *             - in: query
+ *               name: sortDown
+ *               schema:
+ *                 type: boolean
+ *               description: sortDown if you wan to sort the result with number of thumbs up
  *     responses:
  *       200:
  *         description: articles
