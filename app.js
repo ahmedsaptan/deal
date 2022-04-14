@@ -44,6 +44,20 @@ const options = {
         url: `${ROOT_URL}/api/`,
       },
     ],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+        },
+      },
+    },
+    security: [
+      {
+        bearerAuth: [],
+      },
+    ],
   },
   apis: ["./routes/*.js"],
 };

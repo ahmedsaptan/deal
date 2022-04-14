@@ -27,7 +27,7 @@ const createArticle = async (req, res, next) => {
     currentUser.articles.push(article._id);
 
     const [] = await Promise.all([article.save(), currentUser.save()]);
-    res.send({
+    res.status(201).send({
       article,
     });
   } catch (error) {
