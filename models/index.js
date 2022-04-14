@@ -5,6 +5,12 @@ main().catch((err) => console.log(err));
 async function main() {
   let mongoUrl;
 
+  console.table({
+    NODE_ENV,
+    MONGO_URL_TEST,
+    MONGO_URL_PROD,
+    MONGO_URL_DEV,
+  });
   switch (NODE_ENV) {
     case "test":
       mongoUrl = MONGO_URL_TEST;
