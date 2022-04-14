@@ -3,7 +3,7 @@ const { Schema } = mongoose;
 
 const articleSchema = new Schema(
   {
-    tile: String,
+    title: String,
     body: String,
     author: {
       type: mongoose.Schema.Types.ObjectId,

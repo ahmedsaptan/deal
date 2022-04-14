@@ -7,26 +7,17 @@ const createError = require("http-errors");
 const { body } = require("express-validator");
 const checkValidations = require("./../helper/checkMethod");
 
-const validateOnCreateAuthor = () => {
-  return [
-    body("name").exists().withMessage("name is required").bail(),
-    body("jobTitle").exists().withMessage("jobTitle is required").bail(),
-  ];
-};
-
-const createAuthor = async (req, res, next) => {
-    try {
-        const body = checkValidations(req);
-        
+const listAuthors = async (req, res, next) => {
+  try {
+    const authors = await Author.find();
+    res.send({
+      authors,
+    });
   } catch (error) {
     next(error);
   }
 };
 
-const listAuthor = async (req, res, next) => {};
-
 module.exports = {
-  createAuthor,
-  listAuthor,
-  validateOnCreateAuthor,
+  listAuthors,
 };

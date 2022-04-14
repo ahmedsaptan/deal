@@ -24,7 +24,9 @@ const createArticle = async (req, res, next) => {
       author: currentUser._id,
     });
 
-    await article.save();
+    currentUser.articles.push(article._id);
+
+    const [] = await Promise.all([article.save(), currentUser.save()]);
     res.send({
       article,
     });
@@ -59,10 +61,111 @@ const getOneArticle = async (req, res, next) => {
   }
 };
 
+// const t = () => {
+//      try {
+//     const body = checkValidations(req);
+//     const user = req.user;
+//     const isStudent = user.role === "student";
+//     let enrolledSection;
+//     let enrolledCourses;
+//     let query = {
+//       active: true,
+//     };
+//     let sortQuery = { order: 1 };
+//     const {
+//       searchTerm,
+//       sortColumn,
+//       sortDirection,
+//       sectionId,
+//       active,
+//       courseName,
+//       quizes,
+//     } = req.query;
+//     if (searchTerm && searchTerm !== "null" && searchTerm !== "undefined") {
+//       query.$or = [{ name: { $regex: searchTerm, $options: "i" } }];
+//     }
+
+//     let populate = null;
+//     if (courseName === "true" || courseName === true) {
+//       populate = {
+//         path: "sectionId",
+//         select: "name",
+//       };
+//       console.log(populate);
+//     }
+//     if (
+//       active &&
+//       (active === "true" ||
+//         active === "false" ||
+//         active === true ||
+//         active === false)
+//     ) {
+//       query.active = active === "true" || active === true;
+//     }
+
+//     if (active && active === "all") {
+//       delete query.active;
+//     }
+
+//     if (sortColumn) {
+//       sortQuery = {};
+//       sortQuery[`${sortColumn}`] = sortDirection === "asc" ? 1 : -1;
+//     }
+
+//     if (sectionId) {
+//       query.sectionId = sectionId;
+//     }
+//     if (sectionId && isStudent) {
+//       // check fot his section
+//       enrolledSection = await EnrolledSection.findOne(
+//         {
+//           user: user._id,
+//           section: sectionId,
+//         },
+//         {},
+//         { lean: true }
+//       );
+
+//       if (!enrolledSection) {
+//         // get all course
+//         enrolledCourses = await EnrolledCourse.find(
+//           {
+//             user: user._id,
+//           },
+//           {},
+//           { lean: true }
+//         );
+//       }
+//     }
+
+//     let courses = await Course.find(query, {}, { lean: true })
+//       .sort(sortQuery)
+//       .populate({
+//         path: "quizes",
+//         populate: "questions",
+//       })
+//       .populate(populate);
+//     let count = await Course.countDocuments(query);
+
+//   } catch (e) {
+//     console.log(e);
+//     next(e);
+//   }
+// }
 const listArticle = async (req, res, next) => {
   try {
     checkValidations(req);
-    const articles = await Article.find();
+    let query = {};
+    let sortQuery = { _id: -1 };
+    const { searchTerm } = req.query;
+    console.log(searchTerm);
+    if (searchTerm && searchTerm !== "null" && searchTerm !== "undefined") {
+      query.$or = [
+        { title: { $regex: searchTerm, $options: "i" } },
+        { body: { $regex: searchTerm, $options: "i" } },
+      ];
+    }
+    const articles = await Article.find(query).sort(sortQuery);
     res.send({
       articles,
     });
@@ -134,6 +237,7 @@ const validateOnGetById = () => {
 const thumbsUp = async (req, res, next) => {
   try {
     const article = req.existArticle;
+
     const currentUser = req.currentUser;
     const [existDown, existUp] = await Promise.all([
       ThumbsDownModel.findOne({
@@ -151,7 +255,10 @@ const thumbsUp = async (req, res, next) => {
     }
     // then. remove one from down
     if (existDown) {
-      currentUser.thumbsDownCount--;
+      // decrement author of article
+      const updateAuthor = await Author.findByIdAndUpdate(article.author, {
+        $inc: { articlesThumbsDownCount: -1 },
+      });
       article.thumbsDownCount--;
       await existDown.remove();
     }
@@ -161,10 +268,12 @@ const thumbsUp = async (req, res, next) => {
       article: article._id,
     });
 
-    currentUser.thumbsUpCount++;
+    const updateAuthor = await Author.findByIdAndUpdate(article.author, {
+      $inc: { articlesThumbsDownCount: 1 },
+    });
     article.thumbsUpCount++;
 
-    await Promise.all([up.save(), currentUser.save(), article.save()]);
+    await Promise.all([up.save(), article.save()]);
 
     res.send({
       up,
@@ -193,7 +302,9 @@ const thumbsDown = async (req, res, next) => {
     }
     // then. remove one from down
     if (existUp) {
-      currentUser.thumbsUpCount--;
+      const updateAuthor = await Author.findByIdAndUpdate(article.author, {
+        $inc: { articlesThumbsUpCount: -1 },
+      });
       article.thumbsUpCount--;
       await existUp.remove();
     }
@@ -203,10 +314,12 @@ const thumbsDown = async (req, res, next) => {
       article: article._id,
     });
 
-    currentUser.thumbsDownCount++;
+    const updateAuthor = await Author.findByIdAndUpdate(article.author, {
+      $inc: { articlesThumbsDownCount: 1 },
+    });
     article.thumbsDownCount++;
 
-    await Promise.all([down.save(), currentUser.save(), article.save()]);
+    await Promise.all([down.save(), article.save()]);
 
     res.send({
       down,

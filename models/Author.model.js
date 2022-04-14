@@ -17,11 +17,11 @@ const authorSchema = new Schema(
         ref: "Article",
       },
     ],
-    thumbsUpCount: {
+    articlesThumbsUpCount: {
       type: Number,
       default: 0,
     },
-    thumbsDownCount: {
+    articlesThumbsDownCount: {
       type: Number,
       default: 0,
     },
