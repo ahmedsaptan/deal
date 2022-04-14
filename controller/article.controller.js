@@ -61,109 +61,29 @@ const getOneArticle = async (req, res, next) => {
   }
 };
 
-// const t = () => {
-//      try {
-//     const body = checkValidations(req);
-//     const user = req.user;
-//     const isStudent = user.role === "student";
-//     let enrolledSection;
-//     let enrolledCourses;
-//     let query = {
-//       active: true,
-//     };
-//     let sortQuery = { order: 1 };
-//     const {
-//       searchTerm,
-//       sortColumn,
-//       sortDirection,
-//       sectionId,
-//       active,
-//       courseName,
-//       quizes,
-//     } = req.query;
-//     if (searchTerm && searchTerm !== "null" && searchTerm !== "undefined") {
-//       query.$or = [{ name: { $regex: searchTerm, $options: "i" } }];
-//     }
-
-//     let populate = null;
-//     if (courseName === "true" || courseName === true) {
-//       populate = {
-//         path: "sectionId",
-//         select: "name",
-//       };
-//       console.log(populate);
-//     }
-//     if (
-//       active &&
-//       (active === "true" ||
-//         active === "false" ||
-//         active === true ||
-//         active === false)
-//     ) {
-//       query.active = active === "true" || active === true;
-//     }
-
-//     if (active && active === "all") {
-//       delete query.active;
-//     }
-
-//     if (sortColumn) {
-//       sortQuery = {};
-//       sortQuery[`${sortColumn}`] = sortDirection === "asc" ? 1 : -1;
-//     }
-
-//     if (sectionId) {
-//       query.sectionId = sectionId;
-//     }
-//     if (sectionId && isStudent) {
-//       // check fot his section
-//       enrolledSection = await EnrolledSection.findOne(
-//         {
-//           user: user._id,
-//           section: sectionId,
-//         },
-//         {},
-//         { lean: true }
-//       );
-
-//       if (!enrolledSection) {
-//         // get all course
-//         enrolledCourses = await EnrolledCourse.find(
-//           {
-//             user: user._id,
-//           },
-//           {},
-//           { lean: true }
-//         );
-//       }
-//     }
-
-//     let courses = await Course.find(query, {}, { lean: true })
-//       .sort(sortQuery)
-//       .populate({
-//         path: "quizes",
-//         populate: "questions",
-//       })
-//       .populate(populate);
-//     let count = await Course.countDocuments(query);
-
-//   } catch (e) {
-//     console.log(e);
-//     next(e);
-//   }
-// }
 const listArticle = async (req, res, next) => {
   try {
     checkValidations(req);
     let query = {};
     let sortQuery = { _id: -1 };
-    const { searchTerm } = req.query;
-    console.log(searchTerm);
+    const { searchTerm, sortUp, sortDown } = req.query;
     if (searchTerm && searchTerm !== "null" && searchTerm !== "undefined") {
       query.$or = [
         { title: { $regex: searchTerm, $options: "i" } },
         { body: { $regex: searchTerm, $options: "i" } },
       ];
+    }
+
+    if (sortUp && sortUp !== "null" && sortUp !== "undefined") {
+      sortQuery = {
+        thumbsUpCount: -1,
+      };
+    }
+
+    if (sortDown && sortDown !== "null" && sortDown !== "undefined") {
+      sortQuery = {
+        thumbsDownCount: -1,
+      };
     }
     const articles = await Article.find(query).sort(sortQuery);
     res.send({
