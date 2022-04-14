@@ -13,15 +13,10 @@ require("./models");
 const indexRouter = require("./routes/index");
 
 const app = express();
-app.use(logger("tiny"));
+app.use(logger("combined"));
 app.use(express.json());
 app.use(helmet());
 app.use(compression());
-app.use(
-  rid({
-    headerName: "X-RID",
-  })
-);
 app.use(cors());
 
 app.use(express.urlencoded({ extended: false }));
@@ -36,7 +31,6 @@ app.use(function (req, res, next) {
 
 // error handler
 app.use(function (err, req, res, next) {
-  console.log(err);
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get("env") === "development" ? err : {};

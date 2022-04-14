@@ -34,7 +34,6 @@ const login = async (req, res, next) => {
   try {
     let body = checkValidations(req);
     const author = req.author;
-    console.log(author);
     const match = await bcrypt.compare(body.password, author.password);
 
     if (match) {
@@ -49,7 +48,6 @@ const login = async (req, res, next) => {
       throw createError.Unauthorized();
     }
   } catch (error) {
-    console.log(error);
     next(error);
   }
 };

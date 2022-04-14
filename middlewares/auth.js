@@ -5,9 +5,6 @@ const Author = require("../models/Author.model");
 const auth = async (req, res, next) => {
   try {
     const token = req.headers["authorization"];
-    console.log({
-      token,
-    });
     const tokenValue = token.split(" ")[1];
     const decoded = jwt.verify(tokenValue, JWT_SECURE);
 
