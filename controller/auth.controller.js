@@ -21,7 +21,7 @@ const register = async (req, res, next) => {
     author.password = undefined;
 
     const token = await genToken(author._id);
-    return res.send({
+    return res.status(201).send({
       author,
       token,
     });

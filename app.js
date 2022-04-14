@@ -13,7 +13,7 @@ require("./models");
 const indexRouter = require("./routes/index");
 
 const app = express();
-app.use(logger("dev"));
+app.use(logger("tiny"));
 app.use(express.json());
 app.use(helmet());
 app.use(compression());
