@@ -35,6 +35,9 @@ const ROOT_URL =
   process.env == "production"
     ? "https://saptan-deal.herokuapp.com"
     : "http://localhost:3000";
+console.table({
+  ROOT_URL,
+});
 const options = {
   definition: {
     openapi: "3.0.0",
