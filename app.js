@@ -32,7 +32,7 @@ app.get("/", (req, res) => {
 app.use("/api", indexRouter);
 
 const ROOT_URL =
-  process.env == "production"
+  process.NODE_ENV == "production"
     ? "https://saptan-deal.herokuapp.com"
     : "http://localhost:3000";
 console.table({
