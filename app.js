@@ -6,6 +6,8 @@ const helmet = require("helmet");
 const compression = require("compression");
 const rid = require("connect-rid");
 const cors = require("cors");
+const swaggerUi = require("swagger-ui-express");
+const swaggerJsdoc = require("swagger-jsdoc");
 
 require("dotenv").config();
 require("./models");
@@ -23,6 +25,31 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/api", indexRouter);
+
+const options = {
+  definition: {
+    openapi: "3.0.0",
+    info: {
+      title: "deal app task Express API with Swagger",
+      version: "0.1.0",
+      description:
+        "This is a simple CRUD API application made with Express and documented with Swagger",
+    },
+    servers: [
+      {
+        url: "http://localhost:3000/api/",
+      },
+    ],
+  },
+  apis: ["./routes/*.js"],
+};
+
+const specs = swaggerJsdoc(options);
+app.use(
+  "/api-docs",
+  swaggerUi.serve,
+  swaggerUi.setup(specs, { explorer: true })
+);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
