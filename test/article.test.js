@@ -119,7 +119,7 @@ describe("Article", () => {
         .send(article)
         .set({ Authorization: `Bearer ${token}` })
         .end((err, res) => {
-          res.should.have.status(200);
+          res.should.have.status(201);
           res.body.should.be.a("object");
           res.body.article.should.have.property("title");
           res.body.article.should.have.property("author");
@@ -187,5 +187,4 @@ describe("Article", () => {
 
     // -----------
   });
-
 });
