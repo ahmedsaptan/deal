@@ -68,10 +68,14 @@ const listArticle = async (req, res, next) => {
     let sortQuery = { _id: -1 };
     const { searchTerm, sortUp, sortDown } = req.query;
     if (searchTerm && searchTerm !== "null" && searchTerm !== "undefined") {
-      query.$or = [
-        { title: { $regex: searchTerm, $options: "i" } },
-        { body: { $regex: searchTerm, $options: "i" } },
-      ];
+      query.$text = { $search: searchTerm };
+      query.score = {
+        $meta: "textScore",
+      };
+      // query.$or = [
+      //   { title: { $regex: searchTerm, $options: "i" } },
+      //   { body: { $regex: searchTerm, $options: "i" } },
+      // ];
     }
 
     if (sortUp && sortUp !== "null" && sortUp !== "undefined") {
