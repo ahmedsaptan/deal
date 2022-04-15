@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const { NODE_ENV, MONGO_URL_TEST, MONGO_URL_PROD, MONGO_URL_DEV } = process.env;
+
 main().catch((err) => console.log(err));
 
 async function main() {

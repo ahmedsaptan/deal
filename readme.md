@@ -18,3 +18,13 @@
 
 
 * and other two models thumbsDown, thumbsUp have author and article. so when need to get all thumbs by given user we get from this tables, 
+
+
+
+## how to run project
+
+```
+ docker-compose up  
+```
+
+and server will start at port 3000
